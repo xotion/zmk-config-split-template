@@ -18,7 +18,7 @@
 #
 ---
 include:
-  - board: supermini_nrf52840
+  - board: nice_nano_v2
     shield: corne_left
-  - board: supermini_nrf52840
+  - board: nice_nano_v2
     shield: corne_right
