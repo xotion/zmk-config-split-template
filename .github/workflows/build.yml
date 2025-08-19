@@ -3,16 +3,57 @@ on: [push, pull_request, workflow_dispatch]
 name: Build
 
 jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    name: Fetch Build Keyboards
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install yaml2json
+        run: python3 -m pip install remarshal
+      - name: Fetch Build Matrix
+        id: set-matrix
+        run: |
+          matrix=$(yaml2json build.yaml | jq -c .)
+          echo "matrix=${matrix}" >> $GITHUB_OUTPUT
   build:
     runs-on: ubuntu-latest
     container:
-      image: zmkfirmware/zmk-build-arm:2.5
+      image: zmkfirmware/zmk-build-arm:stable
+    needs: matrix
     name: Build
+    strategy:
+      fail-fast: false
+      matrix: ${{fromJson(needs.matrix.outputs.matrix)}}
     steps:
+      - name: Prepare variables
+        shell: bash
+        env:
+          board: ${{ matrix.board }}
+          shield: ${{ matrix.shield }}
+          artifact-name: ${{ matrix.artifact-name }}
+          cmake-args: ${{ matrix.cmake-args }}
+        run: |
+          if [ -n "${shield}" ]; then
+            EXTRA_CMAKE_ARGS="-DSHIELD=${shield}"
+            ARTIFACT_NAME="${shield}-${board}-zmk"
+            DISPLAY_NAME="${shield} - ${board}"
+          else
+            EXTRA_CMAKE_ARGS=
+            DISPLAY_NAME="${board}"
+            ARTIFACT_NAME="${board}-zmk"
+          fi
+          echo "EXTRA_CMAKE_ARGS=${EXTRA_CMAKE_ARGS}" >> $GITHUB_ENV
+          echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> $GITHUB_ENV
+          echo "DISPLAY_NAME=${DISPLAY_NAME}" >> $GITHUB_ENV
+          echo "CMAKE_ARGS=${cmake-args}" >> $GITHUB_ENV
+          echo "ARTIFACT_NAME_OVERRIDE=${artifact-name}" >> $GITHUB_ENV
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Cache west modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         env:
           cache-name: cache-zephyr-modules
         with:
@@ -33,29 +74,24 @@ jobs:
         run: west update
       - name: West Zephyr export
         run: west zephyr-export
-      - name: West Build (KEYBOARD_TITLE Left)
-        run: west build -s zmk/app -b BOARD_NAME -- -DSHIELD=SHIELD_NAME_left -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
-      - name: KEYBOARD_TITLE DTS File
-        if: ${{ always() }}
-        run: cat -n build/zephyr/BOARD_NAME.dts.pre.tmp
-      - name: KEYBOARD_TITLE Left Kconfig file
-        run: cat build/zephyr/.config | grep -v "^#" | grep -v "^$"
-      - name: Rename zmk.uf2
-        run: cp build/zephyr/zmk.uf2 SHIELD_NAME_left_BOARD_NAME.uf2
-      - name: Archive (KEYBOARD_TITLE Left)
-        uses: actions/upload-artifact@v2
+      - name: West Build (${{ env.DISPLAY_NAME }})
+        shell: bash
+        run: west build -s zmk/app -b ${{ matrix.board }} -- -DZMK_CONFIG=${GITHUB_WORKSPACE}/config ${{ env.EXTRA_CMAKE_ARGS }} ${{ env.CMAKE_ARGS }}
+      - name: ${{ env.DISPLAY_NAME }} Kconfig file
+        run: grep -v -E "^#|^$" build/zephyr/.config | sort
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          mkdir build/artifacts
+          if [ -f build/zephyr/zmk.uf2 ]
+          then
+            cp build/zephyr/zmk.uf2 "build/artifacts/${{ env.ARTIFACT_NAME }}.uf2"
+          elif [ -f build/zephyr/zmk.hex ]
+          then
+            cp build/zephyr/zmk.hex "build/artifacts/${{ env.ARTIFACT_NAME }}.hex"
+          fi
+      - name: Archive (${{ env.DISPLAY_NAME }})
+        uses: actions/upload-artifact@v4
         with:
-          name: firmware
-          path: SHIELD_NAME_left_BOARD_NAME.uf2
-      - name: West Build (KEYBOARD_TITLE Right)
-        run: west build --pristine -s zmk/app -b BOARD_NAME -- -DSHIELD=SHIELD_NAME_right -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
-
-      - name: KEYBOARD_TITLE Right Kconfig file
-        run: cat build/zephyr/.config | grep -v "^#" | grep -v "^$"
-      - name: Rename zmk.uf2
-        run: cp build/zephyr/zmk.uf2 SHIELD_NAME_right_BOARD_NAME.uf2
-      - name: Archive (KEYBOARD_TITLE Right)
-        uses: actions/upload-artifact@v2
-        with:
-          name: firmware
-          path: SHIELD_NAME_right_BOARD_NAME.uf2
+          name: ${{ env.ARTIFACT_NAME_OVERRIDE != '' && env.ARTIFACT_NAME_OVERRIDE || env.ARTIFACT_NAME }}
+          path: build/artifacts
