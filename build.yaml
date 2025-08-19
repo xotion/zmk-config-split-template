@@ -20,5 +20,5 @@
 include:
   - board: supermini_nrf52840
     shield: corne_left
-  - board: nrfmicro_13
-    shield: supermini_nrf52840
+  - board: supermini_nrf52840
+    shield: corne_right
