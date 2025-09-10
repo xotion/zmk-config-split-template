@@ -12,70 +12,69 @@
         keymap {
                 compatible = "zmk,keymap";
 
-                default_layer { // 0
+default_layer { // 0
 // -----------------------------------------------------------------------------------------
-// | TAB  |  Q  |  W  |  E  |  R  |  T  |   |  Y  |  U   |  I  |  O  |  P  | BKSP |
-// | CTRL |  A  |  S  |  D  |  F  |  G  |   |  H  |  J   |  K  |  L  |  ;  |  '   |
-// | SHFT |  Z  |  X  |  C  |  V  |  B  |   |  N  |  M   |  ,  |  .  |  /  | SHFT |
-//                    |     |     | SPC |   | ENT |      | ALT |
-                        bindings = <
-   &kp TAB   &kp Q &kp W &kp E &kp R &kp T   &kp Y &kp U  &kp I     &kp O   &kp P    &kp BSPC
-   &kp LCTRL &kp A &kp S &kp D &kp F &kp G   &kp H &kp J  &kp K     &kp L   &kp SEMI &kp SQT
-   &kp LSHFT &kp Z &kp X &kp C &kp V &kp B   &kp N &kp M  &kp COMMA &kp DOT &kp FSLH &kp RSHIFT
-                     &mo 3 &mo 1 &kp SPACE   &kp RET &mo 2 &kp RALT
-                        >;
-                };
+// | TAB ALT  |  Q  |  W  |  E  |  R  |  T  |      |  Y  |  U   |  I  |  O  |  P  | BKSP |
+// | CTRL     |  A  |  S  |  D  |  F  |  G  |      |  H  |  J   |  K  |  L  |  ;  |  '   |
+// | SHFT     |  Z  |  X  |  C  |  V  |  B  |      |  N  |  M   |  ,  |  .  |  /  | SHFT |
+//                        |     |     | SPC |      | ENT |      | ALT |
+bindings = <
+   &mt LALT TAB  &kp Q &kp W &kp E &kp R &kp T   &kp Y &kp U  &kp I     &kp O   &kp P    &kp BSPC
+   &kp LCTRL &kp A &kp S &kp D &kp F &kp G       &kp H &kp J  &kp K     &kp L   &kp SEMI &kp SQT
+   &kp LSHFT &kp Z &kp X &kp C &kp V &kp B       &kp N &kp M  &kp COMMA &kp DOT &kp FSLH &kp RSHIFT
+                     &mo 3 &mo 1 &kp SPACE       &kp RET &mo 2 &kp RALT
+>;
+};
 
-                lower_layer { // &mo 1
+lower_layer { // &mo 1
 // -----------------------------------------------------------------------------------------
-// | TAB  |  F1 |  F2 |  F3 |  F4 |  F5 |   |     |     |     |     |     | BKSP |
-// | CTRL |  F6 |  F7 |  F8 |  F9 | F10 |   | HOME| LFT |  UP | RGT | END |      |
-// | SHFT | F11 | F12 |     |     |     |   |     |     | DWN |     |     | LGUI |
-//                    |     |     | SPC |   | ENT |     | ALT |
-                        bindings = <
-   &kp TAB    &kp F1  &kp F2  &kp F3 &kp F4 &kp F5    &none    &none    &none    &none     &none   &kp BSPC
-   &kp LCTRL  &kp F6  &kp F7  &kp F8 &kp F9 &kp F10   &kp HOME &kp LEFT &kp UP   &kp RIGHT &kp END &none
-   &kp LSHFT  &kp F11 &kp F12 &none  &none  &none     &none    &none    &kp DOWN &none     &none   &kp LGUI
-                        &mo 3 &trans &kp SPACE        &kp RET  &mo 2    &kp RALT
-                        >;
-                };
+// | TAB ALT  |  F1 |  F2 |  F3 |  F4 |  F5 |      |      |     | PSCRN | PSCRN | PSCRN | BKSP |
+// | CTRL     |  F6 |  F7 |  F8 |  F9 | F10 |      | HOME | LFT |   UP  |  RGT  |  END  |      |
+// | SHFT     | F11 | F12 |     |     |     |      |      |     |  DWN  |       |       | LGUI |
+//                        |     |     | SPC |      | ENT  |     |  ALT  |
+bindings = <
+   &mt LALT TAB  &kp F1  &kp F2  &kp F3 &kp F4 &kp F5    &none    &none &kp PSCRN &kp LS(PSCRN) &kp RC(LS(PSCRN)) &kp BSPC
+   &kp LCTRL  &kp F6  &kp F7  &kp F8 &kp F9 &kp F10      &kp HOME &kp LEFT &kp UP   &kp RIGHT &kp END &none
+   &kp LSHFT  &kp F11 &kp F12 &none  &none  &none        &none    &none    &kp DOWN &none     &none   &kp LGUI
+                        &mo 3 &trans &kp SPACE           &kp RET  &mo 2    &kp RALT
+>;
+};
 
-                ctrl_layer { // &mo 2
+ctrl_layer { // &mo 2
 // -----------------------------------------------------------------------------------------
-// |  ESC |  !  |  @  |  #  |  $  |  %      |   |  ^  |  &  |  (  |  )  |  *  | BKSP |
-// | CTRL |LC(A)|LC(S)|LC(D)|LC(F)| fx_arrow|   |  -  |  =  |  [  |  ]  |  \  |  `   |
-// | SHFT |LC(Z)|LC(X)|LC(C)|LC(V)| CAPS    |   |  _  |  +  |  {  |  }  | "|" |  ~   |
-//                    |     |     | SPC     |   | ENT |     | ALT |
-                        bindings = <
+// |  ESC    |  !  |  @  |  #  |  $  |  %      |       |  ^  |  &  |  (  |  )  |  *  | BKSP |
+// | CTRL    |LC(A)|LC(S)|LC(D)|LC(F)| fx_arrow|       |  -  |  =  |  [  |  ]  |  \  |  `   |
+// | SHFT    |LC(Z)|LC(X)|LC(C)|LC(V)| CAPS    |       |  _  |  +  |  {  |  }  | "|" |  ~   |
+//                       |     |     | SPC     |       | ENT |     | ALT |
+bindings = <
    &kp ESC   &kp EXCL  &kp AT &kp HASH &kp DLLR &kp PRCNT          &kp CARET &kp AMPS  &kp LPAR &kp RPAR &kp ASTRK &kp BSPC
    &kp LCTRL &kp LC(A) &kp LC(S) &kp LC(D) &kp LC(F) &fx_arrow     &kp MINUS &kp EQUAL &kp LBKT &kp RBKT &kp BSLH  &kp GRAVE
    &kp LSHFT &kp LC(Z) &kp LC(X) &kp LC(C) &kp LC(V) &kp CAPS      &kp UNDER &kp PLUS  &kp LBRC &kp RBRC &kp PIPE  &kp TILDE
-                             &mo 3 &mo 1 &kp SPACE   &kp RET &trans &kp RALT
-                        >;
-                };
+                             &mo 3 &mo 1 &kp SPACE                 &kp RET &trans &kp RALT
+>;
+};
 
-                raise_layer { // &mo 3
+raise_layer { // &mo 3
 // -----------------------------------------------------------------------------------------
-// | BTCLR | BT1 | BT2 | BT3 |     |     |   |  7  |  8  |  9  |  0  |  *  | BKSP |
-// |       |     |     |     |     |     |   |  4  |  5  |  6  |  ,  |  +  |  /   |
-// |       |     |     |     |     |     |   |  1  |  2  |  3  |  .  |  -  |  %   |
-//                     |     |     | SPC |   | ENT |     | ALT |
-                        bindings = <
-   &bt BT_CLR &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &none &none      &kp N7 &kp N8 &kp N9 &kp N0    &kp ASTRK &kp BSPC
+// |       | BT1 | BT2 | BT3 |     |     |       |  7  |  8  |  9  |  0  |  *  | BKSP |
+// |       |     |     |     |     |     |       |  4  |  5  |  6  |  ,  |  +  |  /   |
+// | BTCLR |     |     |     |     |     |       |  1  |  2  |  3  |  .  |  -  |  %   |
+//                     |     |     | SPC |       | ENT |     | ALT |
+bindings = <
+   &none      &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &none &none      &kp N7 &kp N8 &kp N9 &kp N0    &kp ASTRK &kp BSPC
    &none      &none        &none        &none        &none &none      &kp N4 &kp N5 &kp N6 &kp COMMA &kp PLUS  &kp FSLH
-   &none      &none        &none        &none        &none &none      &kp N1 &kp N2 &kp N3 &kp DOT   &kp MINUS &kp PRCNT
-                             &trans &mo 1 &kp SPACE &kp RET &mo 2 &kp RALT
-                        >;
-                };
-        };
+   &bt BT_CLR &none        &none        &none        &none &none      &kp N1 &kp N2 &kp N3 &kp DOT   &kp MINUS &kp PRCNT
+                                          &trans &mo 1 &kp SPACE      &kp RET &mo 2 &kp RALT
+>;
+};
+
+};
 
     macros {
         fx_arrow: fx_arrow {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            bindings
-                = <&macro_tap &kp MINUS &kp GREATER_THAN>
-                ;
+            bindings = <&macro_tap &kp MINUS &kp GREATER_THAN>;
         };
     };
 };
